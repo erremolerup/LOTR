@@ -15,27 +15,27 @@ namespace LOTR_game
         public List<Card> CardsOnBoard { get; set; }
         public int Resources { get; set; }
 
-        public LifeChanger()
+        public void LifeChanger()
         {
 
         }
 
-        public ResourceChanger()
+        public void ResourceChanger()
         {
 
         }
 
-        public PlayCard()
+        public void PlayCard()
         {
 
         }
 
-        public ReceiveCard()
+        public void ReceiveCard()
         {
 
         }
 
-        public ChangePlayerTurn()
+        public void ChangePlayerTurn()
         {
 
         }

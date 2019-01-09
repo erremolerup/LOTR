@@ -15,27 +15,31 @@ namespace LOTR_game
 
         readonly DataAccess _dataAccess;
 
-        public Run()
+        public void Run()
+        {
+            SetUpNewGame();
+        }
+
+        public void GameLoop()
         {
 
         }
 
-        public GameLoop()
+        public void StartMenu()
         {
 
         }
 
-        public StartMenu()
+        public void SetUpNewGame()
         {
+            GameDeck = new Deck();
+            GameDeck.PopulateDeck();
+            GameDeck.Shuffle();
+
 
         }
 
-        public SetUpNewGame()
-        {
-
-        }
-
-        public EndGame()
+        public void EndGame()
         {
 
         }

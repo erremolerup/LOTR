@@ -8,20 +8,32 @@ namespace LOTR_game
 {
     public class Deck
     {
+
+        readonly DataAccess _dataAccess;
+
         public List<Card> PlayingDeck {get ; set ; }
 
-        public Shuffle()
+        public Deck()
+        {
+            _dataAccess = new DataAccess();
+        }
+
+        public void Shuffle()
         {
 
         }
 
-        public DrawCard()
+        public Card DrawCard()
         {
-
+            return null;
         }
 
-        public PopulateDeck()
+        public void PopulateDeck()
         {
+            List<Card> list =_dataAccess.GetAllUniqueCards();
+            //Skapar en deck med massor av kort från vår lista med unika kort
+            PlayingDeck = list;
+            //Shuffle(list)
 
         }
 

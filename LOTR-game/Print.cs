@@ -10,32 +10,32 @@ namespace LOTR_game
     {
         
 
-        public GameLogo()
+        public void GameLogo()
         {
 
         }
 
-        public CardOnBoard()
+        public void CardOnBoard()
         {
 
         }
 
-        public CardInHand()
+        public void CardInHand()
         {
 
         }
 
-        public StartMenu()
+        public void StartMenu()
         {
 
         }
 
-        public PlayChoices()
+        public void PlayChoices()
         {
 
         }
 
-        public Battlefield()
+        public void Battlefield()
         {
 
         }

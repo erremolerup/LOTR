@@ -6,7 +6,9 @@ namespace LOTR_game
     {
         static void Main(string[] args)
         {
-            Game.Run();
+            Game game = new Game();
+
+            game.Run();
         }
     }
 }
