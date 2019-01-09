@@ -8,6 +8,14 @@ namespace LOTR_game
 {
     public class CardAbility
     {
-        
+        public int Value { get; set; }
+        public AbilityType Type { get; set; }
+    }
+
+    public enum AbilityType
+    {
+        LifeGain,
+        Damage,
+        DrawCard
     }
 }

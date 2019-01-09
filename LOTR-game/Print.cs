@@ -9,5 +9,36 @@ namespace LOTR_game
     public class Print
     {
         
+
+        public GameLogo()
+        {
+
+        }
+
+        public CardOnBoard()
+        {
+
+        }
+
+        public CardInHand()
+        {
+
+        }
+
+        public StartMenu()
+        {
+
+        }
+
+        public PlayChoices()
+        {
+
+        }
+
+        public Battlefield()
+        {
+
+        }
+
     }
 }

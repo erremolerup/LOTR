@@ -8,6 +8,24 @@ namespace LOTR_game
 {
     public class Deck
     {
-        
+        public List<Card> PlayingDeck {get ; set ; }
+
+        public Shuffle()
+        {
+
+        }
+
+        public DrawCard()
+        {
+
+        }
+
+        public PopulateDeck()
+        {
+
+        }
+
     }
+
+
 }

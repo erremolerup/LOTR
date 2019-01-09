@@ -8,6 +8,11 @@ namespace LOTR_game
 {
     public class DataAccess
     {
-        
+
+        GetUniqueCards()
+        {
+
+        }
+
     }
 }
