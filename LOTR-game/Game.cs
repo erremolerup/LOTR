@@ -36,7 +36,11 @@ namespace LOTR_game
             GameDeck.PopulateDeck();
             GameDeck.Shuffle();
 
+        }
 
+        public void AddPlayersToGame()
+        {
+            List<Player> players = _dataAccess.GetAllUniquePlayers();
         }
 
         public void EndGame()

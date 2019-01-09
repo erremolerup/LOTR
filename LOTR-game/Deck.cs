@@ -20,12 +20,15 @@ namespace LOTR_game
 
         public void Shuffle()
         {
-
+            PlayingDeck = PlayingDeck.OrderBy(c => Guid.NewGuid()).ToList();
         }
 
         public Card DrawCard()
         {
-            return null;
+            var card = PlayingDeck.FirstOrDefault();
+            PlayingDeck.Remove(card);
+
+            return card;
         }
 
         public void PopulateDeck()
@@ -33,7 +36,6 @@ namespace LOTR_game
             List<Card> list =_dataAccess.GetAllUniqueCards();
             //Skapar en deck med massor av kort från vår lista med unika kort
             PlayingDeck = list;
-            //Shuffle(list)
 
         }
 

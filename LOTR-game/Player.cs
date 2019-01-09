@@ -14,6 +14,8 @@ namespace LOTR_game
         public List<Card> CardsInHand { get; set; }
         public List<Card> CardsOnBoard { get; set; }
         public int Resources { get; set; }
+        public int Wins { get; set; }
+        public int Losses { get; set; }
 
         public void LifeChanger()
         {
