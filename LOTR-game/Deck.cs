@@ -11,11 +11,12 @@ namespace LOTR_game
 
         readonly DataAccess _dataAccess;
 
-        public List<Card> PlayingDeck {get ; set ; }
+        public List<Card> PlayingDeck { get; set; }
 
         public Deck()
         {
             _dataAccess = new DataAccess();
+            PlayingDeck = new List<Card>();
         }
 
         public void Shuffle()
@@ -33,10 +34,27 @@ namespace LOTR_game
 
         public void PopulateDeck()
         {
-            List<Card> list =_dataAccess.GetAllUniqueCards();
-            //Skapar en deck med massor av kort från vår lista med unika kort
-            PlayingDeck = list;
+            List<Card> list = _dataAccess.GetAllUniqueCards();
+            foreach (Card card in list)
+            {
 
+                for (int i = 0; i < 10; i++)
+                {
+                    PlayingDeck.Add(new Card
+                    {
+                        Name = card.Name,
+                        Attack = card.Attack,
+                        Health = card.Health,
+                        Cost = card.Cost,
+                        Id = card.Id,
+                        Type = card.Type,
+                        Abilities = card.Abilities
+
+                    });
+
+                }
+
+            }
         }
 
     }

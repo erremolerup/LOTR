@@ -16,7 +16,8 @@ namespace LOTR_game
         {
             var sql = @"SELECT * FROM Card
                         INNER JOIN CardType ON CardTypeId = CardType.Id
-                        LEFT JOIN CardAbilities On CardAbilitiesId = CardAbilities.Id
+                        LEFT JOIN AbilityToCard On AbilityToCard.CardId = Card.Id
+                        LEFT JOIN CardAbilities ON CardAbilities.Id = AbilityToCard.CardAbility
                         LEFT JOIN AbilityType ON AbilitieTypeId = AbilityType.Id";
 
             using (SqlConnection connection = new SqlConnection(conString))
@@ -30,32 +31,41 @@ namespace LOTR_game
 
                 while (reader.Read())
                 {
-                    Card c = new Card
+                    if (!list.Any(x => x.Id == reader.GetSqlInt32(0).Value))
                     {
-                        Name = reader.GetSqlString(1).Value,
-                        Cost = reader.GetSqlInt32(2).Value,
-                        Type = (CardType)Enum.Parse(typeof(CardType), reader.GetSqlString(8).Value)
-                        
-                    };
 
-                    if (!reader.IsDBNull(5) && !reader.IsDBNull(6))
-                    {
-                        c.Attack = reader.GetSqlInt32(5).Value;
-                        c.Health = reader.GetSqlInt32(6).Value;
-                    }
-
-                    if (!reader.IsDBNull(4))
-                    {
-                        CardAbility cardAbility = new CardAbility
+                        Card c = new Card
                         {
-                            Type = (AbilityType)Enum.Parse(typeof(AbilityType), reader.GetSqlString(13).Value),
-                            Value = reader.GetSqlInt32(11).Value
+                            Id = reader.GetSqlInt32(0).Value,
+                            Name = reader.GetSqlString(1).Value,
+                            Cost = reader.GetSqlInt32(2).Value,
+                            Type = (CardType)Enum.Parse(typeof(CardType), reader.GetSqlString(7).Value)
+
                         };
 
-                        c.Ability = cardAbility;
+                        if (!reader.IsDBNull(4) && !reader.IsDBNull(5))
+                        {
+                            c.Attack = reader.GetSqlInt32(4).Value;
+                            c.Health = reader.GetSqlInt32(5).Value;
+                        }
+
+                        list.Add(c);
+
                     }
 
-                    list.Add(c);
+
+                    if (!reader.IsDBNull(8))
+                    {
+
+                        CardAbility cardAbility = new CardAbility
+                        {
+                            Type = (AbilityType)Enum.Parse(typeof(AbilityType), reader.GetSqlString(14).Value),
+                            Value = reader.GetSqlInt32(12).Value
+                        };
+                        
+                        list[list.Count - 1].Abilities.Add(cardAbility);
+                    }
+
 
                 }
                 return list;
