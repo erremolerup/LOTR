@@ -48,7 +48,7 @@ namespace LOTR_game
 
     public enum CardType
     {
-        Creature,
+        Creature=1,
         Spell
     }
 }

@@ -13,7 +13,11 @@ namespace LOTR_game
         public List<Player> Players { get; set; }
         public bool EndConditionReached { get; set; }
         readonly Print _print;
+
         readonly DataAccess _dataAccess;
+        readonly string _name;
+
+        public string Name { get; set; }
 
         public Game()
         {
@@ -28,6 +32,8 @@ namespace LOTR_game
             _print.StartMenu();
             ConsoleKey menuChoice = Console.ReadKey().Key;
 
+            _dataAccess.GetAllUniqueCards();
+
             switch (menuChoice)
             {
                 case ConsoleKey.D1:
@@ -36,10 +42,75 @@ namespace LOTR_game
                     break;
                 case ConsoleKey.D2:
                     return;
+                case ConsoleKey.D3:
+                    Administration();
+                    return;
                 default:
                     break;
             }
 
+        }
+
+        private void Administration()
+        {
+            Console.WriteLine("Choose action: ");
+            Console.WriteLine("1. CreateNewCard");
+            Console.WriteLine("2. UpdateCard");
+            //Console.WriteLine("3. End your turn");
+            //UpdateACard();
+
+            ConsoleKey menuChoice = Console.ReadKey().Key;
+            switch (menuChoice)
+            {
+                case ConsoleKey.D1:
+                    CreateNewCard();
+                    break;
+                case ConsoleKey.D2:
+                    UpdateACard();
+                    return;
+                case ConsoleKey.D3:
+                    return;
+                default:
+                    break;
+            }
+        }
+
+        private void CreateNewCard()
+        {
+            var newCard = new Card();
+
+            Console.Write("Choose cardname: ");
+            newCard.Name = Console.ReadLine();
+
+            Console.WriteLine();
+
+            Console.Write("Choose cost: ");
+            newCard.Cost = int.Parse(Console.ReadLine());
+
+            Console.WriteLine();
+
+            Console.Write("Choose Attack: ");
+            newCard.Attack = int.Parse(Console.ReadLine());
+
+            Console.WriteLine();
+
+            Console.Write("Choose Health: ");
+            newCard.Health = int.Parse(Console.ReadLine());
+
+            newCard.Type = CardType.Creature;
+
+            _dataAccess.SaveNewCard(newCard);
+        }
+
+        private void UpdateACard()
+        {
+            List<Card> cards = _dataAccess.GetAllUniqueCards();
+
+            Card card1 = cards[0];
+
+            card1.Name = "Magnus";
+
+            _dataAccess.UpdateName(card1);
         }
 
         public void GameLoop()
@@ -51,7 +122,7 @@ namespace LOTR_game
                 {
                     activePlayer.ActivePlayer = true;
                     activePlayer.CardsInHand.Add(GameDeck.DrawCard());
-                    ConsoleKey menuChoice = ConsoleKey.A; 
+                    ConsoleKey menuChoice = ConsoleKey.A;
 
                     while (menuChoice != ConsoleKey.D3)
                     {

@@ -9,10 +9,9 @@ namespace LOTR_game
 {
     public class DataAccess
     {
-
         public string conString = "Server=(localdb)\\mssqllocaldb; Database=LOTR-game";
 
-        public List<Card> GetAllUniqueCards()
+        public List<Card> GetAllUniqueCards() // Läser data från databasen
         {
             var sql = @"SELECT * FROM Card
                         INNER JOIN CardType ON CardTypeId = CardType.Id
@@ -62,7 +61,7 @@ namespace LOTR_game
                             Type = (AbilityType)Enum.Parse(typeof(AbilityType), reader.GetSqlString(14).Value),
                             Value = reader.GetSqlInt32(12).Value
                         };
-                        
+
                         list[list.Count - 1].Abilities.Add(cardAbility);
                     }
 
@@ -70,9 +69,9 @@ namespace LOTR_game
                 }
                 return list;
             }
-        }
+        } 
 
-        public List<Player> GetAllUniquePlayers()
+        public List<Player> GetAllUniquePlayers() // Läser data från databasen
         {
             var sql = @"SELECT * FROM Player";
 
@@ -102,5 +101,52 @@ namespace LOTR_game
             }
         }
 
+        internal void SaveNewCard(Card newCard) //Sparar i databasen
+        {
+            var sql = @"INSERT INTO Card
+                        VALUES (@Name, @Cost, @Type, @Attack, @Health)";
+
+            List<SqlParameter> parameters = new List<SqlParameter>(); //Skapar en lista som vi kan spara alla våra parametrar i.
+            parameters.Add(new SqlParameter("Name", newCard.Name));
+            parameters.Add(new SqlParameter("Cost", newCard.Cost));
+            parameters.Add(new SqlParameter("Type", (int)newCard.Type));
+            parameters.Add(new SqlParameter("Attack", newCard.Attack));
+            parameters.Add(new SqlParameter("Health", newCard.Health));
+
+            using (SqlConnection connection = new SqlConnection(conString))
+            using (SqlCommand command = new SqlCommand(sql, connection))
+            {
+                foreach (var parameter in parameters) //Loop genom alla våra parametrar för att lägga in dem i "command"
+                {
+                    command.Parameters.Add(parameter);
+                }
+        
+                connection.Open();
+
+                command.ExecuteNonQuery(); 
+            }
+        }
+
+        public void UpdateName(Card updatedCard) // Uppdaterar i databasen
+        {
+            var sql = @"UPDATE Card
+                        SET Name = @Name
+                        WHERE Id = @Id";
+
+            SqlParameter parameter = new SqlParameter("Name", updatedCard.Name);
+            SqlParameter parameter2 = new SqlParameter("Id", updatedCard.Id);
+
+            using (SqlConnection connection = new SqlConnection(conString))
+            using (SqlCommand command = new SqlCommand(sql, connection))
+            {
+                command.Parameters.Add(parameter);
+                command.Parameters.Add(parameter2);
+                
+                connection.Open();
+
+                command.ExecuteNonQuery();
+
+            }
+        }
     }
 }
