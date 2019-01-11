@@ -77,27 +77,42 @@ namespace LOTR_game
 
         private void CreateNewCard()
         {
+            Console.Clear();
             var newCard = new Card();
 
             Console.Write("Choose cardname: ");
             newCard.Name = Console.ReadLine();
 
-            Console.WriteLine();
-
             Console.Write("Choose cost: ");
             newCard.Cost = int.Parse(Console.ReadLine());
-
-            Console.WriteLine();
 
             Console.Write("Choose Attack: ");
             newCard.Attack = int.Parse(Console.ReadLine());
 
-            Console.WriteLine();
-
             Console.Write("Choose Health: ");
             newCard.Health = int.Parse(Console.ReadLine());
 
-            newCard.Type = CardType.Creature;
+            Console.Write("Creature or Spell? (c/r)");
+            newCard.Type = Console.ReadLine() == "c" ? CardType.Creature : CardType.Spell;
+
+            int abilityChoice;
+
+            do
+            {
+                Console.WriteLine();
+
+                List<CardAbility> cardAbilities = _dataAccess.GetAllUniqueAbilities();
+
+                for (int i = 0; i < cardAbilities.Count; i++)
+                    Console.WriteLine($"{i}. {cardAbilities[i]}");
+
+                Console.Write("Add an ability index from above or press 0 to continue without abilities: ");
+                abilityChoice = int.Parse(Console.ReadLine());
+                if (abilityChoice != 0)
+                    newCard.Abilities.Add(cardAbilities[abilityChoice-1]);
+
+            } while (abilityChoice != 0);
+
 
             _dataAccess.SaveNewCard(newCard);
         }

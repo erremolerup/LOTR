@@ -10,6 +10,11 @@ namespace LOTR_game
     {
         public int Value { get; set; }
         public AbilityType Type { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Enum.GetName(typeof(AbilityType), Type)} {Value}";
+        }
     }
 
     public enum AbilityType

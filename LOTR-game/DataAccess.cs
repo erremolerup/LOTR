@@ -101,6 +101,37 @@ namespace LOTR_game
             }
         }
 
+        public List<CardAbility> GetAllUniqueAbilities() // Läser data från databasen...
+        {
+             var sql = @"SELECT *
+                        FROM CardAbilities
+                        INNER JOIN AbilityType ON AbilitieTypeId = AbilityType.Id";
+
+            using (SqlConnection connection = new SqlConnection(conString))
+            using (SqlCommand command = new SqlCommand(sql, connection))
+            {
+                connection.Open();
+
+                SqlDataReader reader = command.ExecuteReader();
+
+                var list = new List<CardAbility>();
+
+                while (reader.Read())
+                {
+                    CardAbility p = new CardAbility
+                    {
+                        Value = reader.GetSqlInt32(2).Value,
+                        Type = (AbilityType)Enum.Parse(typeof(AbilityType), reader.GetSqlString(4).Value)
+
+                    };
+
+                    list.Add(p);
+
+                }
+                return list;
+            }
+        }
+
         internal void SaveNewCard(Card newCard) //Sparar i databasen
         {
             var sql = @"INSERT INTO Card
