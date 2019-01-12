@@ -133,8 +133,18 @@ namespace LOTR_game
                     command.Parameters.Add(parameter);
 
                 connection.Open();
-
+                try
+                {
                 command.ExecuteNonQuery();
+                }
+                catch (System.Data.SqlClient.SqlException ex)
+                {
+                    if (ex.Number == 2627)
+                        Console.WriteLine("There is already an ability in the database with these properties");
+                    else
+                        throw ex;
+                    Console.Read();
+                }
             }
         }
 
