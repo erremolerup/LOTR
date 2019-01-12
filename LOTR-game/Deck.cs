@@ -8,7 +8,6 @@ namespace LOTR_game
 {
     public class Deck
     {
-
         readonly DataAccess _dataAccess;
 
         public List<Card> PlayingDeck { get; set; }
@@ -34,11 +33,10 @@ namespace LOTR_game
 
         public void PopulateDeck()
         {
-            List<Card> list = _dataAccess.GetAllUniqueCards();
+            List<Card> list = _dataAccess.GetAllCards();
             foreach (Card card in list)
             {
-
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 5; i++)
                 {
                     PlayingDeck.Add(new Card
                     {

@@ -8,19 +8,22 @@ namespace LOTR_game
 {
     public class CardAbility
     {
+        public int Id { get; set; }
         public int Value { get; set; }
         public AbilityType Type { get; set; }
+        public string TypeName { get; set; }
 
         public override string ToString()
         {
-            return $"{Enum.GetName(typeof(AbilityType), Type)} {Value}";
+            return $"{TypeName}:{Value}";
         }
+
     }
 
     public enum AbilityType
     {
-        LifeGain,
-        Damage,
-        DrawCard
+        Damage = 1,
+        DrawCard,
+        LifeGain
     }
 }

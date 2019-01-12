@@ -22,26 +22,12 @@ namespace LOTR_game
             CardsInHand = new List<Card>();
             CardsOnBoard = new List<Card>() { null, null, null, null, null, null };
 
-            //for (int i = 0; i < 6; i++)
-            //{
-            //    CardsOnBoard[0] = null;
-            //}
-        }
-
-        public void LifeChanger()
-        {
-
-        }
-
-        public void ResourceChanger()
-        {
-
         }
 
         public Card PlayCard()
         {
             Console.WriteLine("Which card do you want to play?");
-            ConsoleKey playCardChoice = Console.ReadKey().Key;
+            ConsoleKey playCardChoice = Console.ReadKey(true).Key;
             int chosenCardIndex = (int)playCardChoice - (int)ConsoleKey.D1;
 
             Card chosenCard = CardsInHand[chosenCardIndex];
@@ -49,7 +35,7 @@ namespace LOTR_game
             if (chosenCard.Type == CardType.Creature)
             {
                 Console.WriteLine("Where do you want to place your creature?");
-                ConsoleKey creaturePlacement = Console.ReadKey().Key;
+                ConsoleKey creaturePlacement = Console.ReadKey(true).Key;
                 int chosenPlacementIndex = (int)creaturePlacement - (int)ConsoleKey.D1;
 
                 CardsOnBoard[chosenPlacementIndex] = chosenCard;
@@ -60,20 +46,11 @@ namespace LOTR_game
 
         }
 
-        public void ReceiveCard()
-        {
-
-        }
-
-        public void ChangePlayerTurn()
-        {
-
-        }
 
         public int SelectAttacker()
         {
             Console.WriteLine("Which creature do you want to attack with?");
-            ConsoleKey attackChoice = Console.ReadKey().Key;
+            ConsoleKey attackChoice = Console.ReadKey(true).Key;
             int chosenCardIndex = (int)attackChoice - (int)ConsoleKey.D1;
 
             Card chosenCard = CardsOnBoard[chosenCardIndex];

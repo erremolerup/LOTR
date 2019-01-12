@@ -11,13 +11,13 @@ namespace LOTR_game
     {
         public string conString = "Server=(localdb)\\mssqllocaldb; Database=LOTR-game";
 
-        public List<Card> GetAllUniqueCards() // Läser data från databasen
+        public List<Card> GetAllCards() // Läser data från databasen
         {
             var sql = @"SELECT * FROM Card
-                        INNER JOIN CardType ON CardTypeId = CardType.Id
-                        LEFT JOIN AbilityToCard On AbilityToCard.CardId = Card.Id
-                        LEFT JOIN CardAbilities ON CardAbilities.Id = AbilityToCard.CardAbility
-                        LEFT JOIN AbilityType ON AbilitieTypeId = AbilityType.Id";
+                        JOIN CardType ON Card.CardTypeId = CardType.CardTypeID
+                        LEFT JOIN AbilityToCard On AbilityToCard.CardId = Card.CardID
+                        LEFT JOIN Ability ON AbilityToCard.AbilityId = Ability.AbilityID
+                        LEFT JOIN AbilityType On Ability.AbilityTypeId = AbilityType.AbilityTypeID";
 
             using (SqlConnection connection = new SqlConnection(conString))
             using (SqlCommand command = new SqlCommand(sql, connection))
@@ -30,48 +30,64 @@ namespace LOTR_game
 
                 while (reader.Read())
                 {
-                    if (!list.Any(x => x.Id == reader.GetSqlInt32(0).Value))
+                    if (!list.Any(x => x.Id == reader.GetSqlInt32(0).Value)) //Kontrollerar om kortet redan finns, nytt kort skapas om  false
                     {
-
                         Card c = new Card
                         {
-                            Id = reader.GetSqlInt32(0).Value,
-                            Name = reader.GetSqlString(1).Value,
-                            Cost = reader.GetSqlInt32(2).Value,
-                            Type = (CardType)Enum.Parse(typeof(CardType), reader.GetSqlString(7).Value)
+                            Id = reader.GetSqlInt32(reader.GetOrdinal("CardID")).Value, // 0
+                            Name = reader.GetSqlString(reader.GetOrdinal("Name")).Value, // 1
+                            Cost = reader.GetSqlInt32(reader.GetOrdinal("Cost")).Value, // 2
+                            Type = (CardType) reader.GetSqlInt32(reader.GetOrdinal("CardTypeId")).Value, // 3
+                            TypeName = reader.GetSqlString(reader.GetOrdinal("CardTypeName")).Value // 7
 
                         };
 
-                        if (!reader.IsDBNull(4) && !reader.IsDBNull(5))
+                        if (!reader.IsDBNull(reader.GetOrdinal("Attack")) && !reader.IsDBNull(reader.GetOrdinal("Health")))
                         {
-                            c.Attack = reader.GetSqlInt32(4).Value;
-                            c.Health = reader.GetSqlInt32(5).Value;
+                            c.Attack = reader.GetSqlInt32(reader.GetOrdinal("Attack")).Value; // 4
+                            c.Health = reader.GetSqlInt32(reader.GetOrdinal("Health")).Value; // 5
                         }
 
                         list.Add(c);
-
                     }
 
-
-                    if (!reader.IsDBNull(8))
+                    if (!reader.IsDBNull(reader.GetOrdinal("AbilityID"))) //8
                     {
-
                         CardAbility cardAbility = new CardAbility
                         {
-                            Type = (AbilityType)Enum.Parse(typeof(AbilityType), reader.GetSqlString(14).Value),
-                            Value = reader.GetSqlInt32(12).Value
+                            Id = reader.GetSqlInt32(reader.GetOrdinal("AbilityID")).Value, //10
+                            Type = (AbilityType) reader.GetSqlInt32(reader.GetOrdinal("AbilityTypeId")).Value, // 12
+                            Value = reader.GetSqlInt32(reader.GetOrdinal("Value")).Value, //13
+                            TypeName = reader.GetSqlString(reader.GetOrdinal("AbilityTypeName")).Value //15
                         };
 
                         list[list.Count - 1].Abilities.Add(cardAbility);
                     }
-
-
                 }
                 return list;
             }
-        } 
+        }
 
-        public List<Player> GetAllUniquePlayers() // Läser data från databasen
+        internal void RemoveCard(Card cardToRemove)
+        {
+            RemoveCardAbilities(cardToRemove);
+
+            var sql = @"DELETE Card
+                        WHERE CardID = @Id";
+
+            List<SqlParameter> parameters = new List<SqlParameter>();//Skapar en lista som vi kan spara alla våra parametrar i.
+            var parameter = new SqlParameter("Id", cardToRemove.Id);
+
+            using (SqlConnection connection = new SqlConnection(conString))
+            using (SqlCommand command = new SqlCommand(sql, connection))
+            {
+                command.Parameters.Add(parameter);
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public List<Player> GetAllPlayers() // Läser data från databasen
         {
             var sql = @"SELECT * FROM Player";
 
@@ -101,11 +117,32 @@ namespace LOTR_game
             }
         }
 
-        public List<CardAbility> GetAllUniqueAbilities() // Läser data från databasen...
+        internal void SaveNewAbility(CardAbility newAbility) // OK
         {
-             var sql = @"SELECT *
-                        FROM CardAbilities
-                        INNER JOIN AbilityType ON AbilitieTypeId = AbilityType.Id";
+            var sql = @"INSERT INTO Ability
+                        VALUES (@AbilityType, @Value)";
+
+            List<SqlParameter> parameters = new List<SqlParameter>(); //Skapar en lista som vi kan spara alla våra parametrar i.
+            parameters.Add(new SqlParameter("AbilityType", (int) newAbility.Type));
+            parameters.Add(new SqlParameter("Value", newAbility.Value));
+
+            using (SqlConnection connection = new SqlConnection(conString))
+            using (SqlCommand command = new SqlCommand(sql, connection))
+            {
+                foreach (var parameter in parameters) //Loop genom alla våra parametrar för att lägga in dem i "command"
+                    command.Parameters.Add(parameter);
+
+                connection.Open();
+
+                command.ExecuteNonQuery();
+            }
+        }
+
+        public List<CardAbility> GetAllAbilities() // OK Läser data från databasen...
+        {
+            var sql = @"SELECT *
+                        FROM Ability
+                        JOIN AbilityType ON Ability.AbilityTypeId = AbilityType.AbilityTypeID";
 
             using (SqlConnection connection = new SqlConnection(conString))
             using (SqlCommand command = new SqlCommand(sql, connection))
@@ -120,24 +157,72 @@ namespace LOTR_game
                 {
                     CardAbility p = new CardAbility
                     {
-                        Value = reader.GetSqlInt32(2).Value,
-                        Type = (AbilityType)Enum.Parse(typeof(AbilityType), reader.GetSqlString(4).Value)
-
+                        Id = reader.GetSqlInt32(reader.GetOrdinal("AbilityID")).Value,  //2
+                        Value = reader.GetSqlInt32(reader.GetOrdinal("Value")).Value, //1
+                        Type = (AbilityType)reader.GetSqlInt32(reader.GetOrdinal("AbilityTypeId")).Value,
+                        TypeName = reader.GetSqlString(reader.GetOrdinal("AbilityTypeName")).Value
                     };
 
                     list.Add(p);
-
                 }
                 return list;
             }
         }
 
-        internal void SaveNewCard(Card newCard) //Sparar i databasen
+        internal void UpdateAllCardAttributes(Card cardToUpdate)
+        {
+            var sql = @"UPDATE Card
+                        SET Name = @Name, Cost = @Cost, Attack = @Attack, Health = @Health
+                        WHERE CardID = @Id";
+
+            List<SqlParameter> parameters = new List<SqlParameter>();//Skapar en lista som vi kan spara alla våra parametrar i.
+            parameters.Add(new SqlParameter("Name", cardToUpdate.Name));
+            parameters.Add(new SqlParameter("Cost", cardToUpdate.Cost));
+            parameters.Add(new SqlParameter("Attack", cardToUpdate.Attack));
+            parameters.Add(new SqlParameter("Health", cardToUpdate.Health));
+            parameters.Add(new SqlParameter("Id", cardToUpdate.Id));
+
+
+            using (SqlConnection connection = new SqlConnection(conString))
+            using (SqlCommand command = new SqlCommand(sql, connection))
+            {
+                foreach (var parameter in parameters)
+                    command.Parameters.Add(parameter);
+
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+
+            RemoveCardAbilities(cardToUpdate);
+            SaveAbilitiesToCard(cardToUpdate);
+
+        }
+
+        internal void RemoveCardAbilities(Card cardToUpdate)
+        {
+            var sql = @"DELETE
+                        FROM AbilityToCard
+                        WHERE CardId = @Id";
+
+            var parameter = new SqlParameter("Id", cardToUpdate.Id);
+
+            using (SqlConnection connection = new SqlConnection(conString))
+            using (SqlCommand command = new SqlCommand(sql, connection))
+            {
+                command.Parameters.Add(parameter);
+                connection.Open();
+                command.ExecuteNonQuery();
+            }
+
+        }
+
+        internal void SaveNewCard(Card newCard) // OK Sparar ett kort i databasen
         {
             var sql = @"INSERT INTO Card
+                        OUTPUT INSERTED.CardID
                         VALUES (@Name, @Cost, @Type, @Attack, @Health)";
 
-            List<SqlParameter> parameters = new List<SqlParameter>(); //Skapar en lista som vi kan spara alla våra parametrar i.
+            List<SqlParameter> parameters = new List<SqlParameter>();//Skapar en lista som vi kan spara alla våra parametrar i.
             parameters.Add(new SqlParameter("Name", newCard.Name));
             parameters.Add(new SqlParameter("Cost", newCard.Cost));
             parameters.Add(new SqlParameter("Type", (int)newCard.Type));
@@ -148,36 +233,43 @@ namespace LOTR_game
             using (SqlCommand command = new SqlCommand(sql, connection))
             {
                 foreach (var parameter in parameters) //Loop genom alla våra parametrar för att lägga in dem i "command"
-                {
                     command.Parameters.Add(parameter);
-                }
-        
-                connection.Open();
 
-                command.ExecuteNonQuery(); 
+                connection.Open();
+                newCard.Id = (int)command.ExecuteScalar();
             }
+
+            SaveAbilitiesToCard(newCard);
+
         }
 
-        public void UpdateName(Card updatedCard) // Uppdaterar i databasen
+        private void SaveAbilitiesToCard(Card newCard) // OK Sparar ett korts abilities i databasen
         {
-            var sql = @"UPDATE Card
-                        SET Name = @Name
-                        WHERE Id = @Id";
-
-            SqlParameter parameter = new SqlParameter("Name", updatedCard.Name);
-            SqlParameter parameter2 = new SqlParameter("Id", updatedCard.Id);
-
-            using (SqlConnection connection = new SqlConnection(conString))
-            using (SqlCommand command = new SqlCommand(sql, connection))
+            foreach (CardAbility ability in newCard.Abilities)
             {
-                command.Parameters.Add(parameter);
-                command.Parameters.Add(parameter2);
-                
-                connection.Open();
 
-                command.ExecuteNonQuery();
+                var sql = @"INSERT INTO AbilityToCard
+                        VALUES (@AbilityId, @CardId)";
 
+                List<SqlParameter> parameters = new List<SqlParameter>()
+                {
+                    new SqlParameter("AbilityId", ability.Id),
+                    new SqlParameter("CardId", newCard.Id)
+                };
+
+                using (SqlConnection connection = new SqlConnection(conString))
+                using (SqlCommand command = new SqlCommand(sql, connection))
+                {
+                    foreach (var parameter in parameters) //Loop genom alla våra parametrar för att lägga in dem i "command"
+                        command.Parameters.Add(parameter);
+
+                    connection.Open();
+
+                    command.ExecuteNonQuery();
+                }
             }
         }
+
+       
     }
 }

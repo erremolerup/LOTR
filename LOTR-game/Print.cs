@@ -41,9 +41,22 @@ namespace LOTR_game
 
         public void StartMenu()
         {
+            Console.Clear();
             GameLogo();
             Console.WriteLine("1. Start Game");
             Console.WriteLine("2. End Game");
+            Console.WriteLine("3. Administrate Cards");
+        }
+
+        internal void AdminMenue()
+        {
+            Console.Clear();
+            Console.WriteLine("Choose action: ");
+            Console.WriteLine("1. Create New Card");
+            Console.WriteLine("2. Create New Ability");
+            Console.WriteLine("3. UpdateCard");
+            Console.WriteLine("4. Remove Card");
+            Console.WriteLine("5. Return to main menue");
         }
 
         public void PlayChoices()
@@ -54,21 +67,30 @@ namespace LOTR_game
             Console.WriteLine("3. End your turn");
         }
 
+        internal void ClearAndPrintIndexedList(List<string> list)
+        {
+            Console.Clear();
+            for (int i = 0; i < list.Count(); i++)
+                Console.WriteLine($"{i + 1}. {list[i]}");
+        }
+
         public void Battlefield(Game game)
         {
             Console.Clear();
 
-
-            Console.Write($"{game.Players[0].Name,-10}: ");
+            if (game.Players[0].ActivePlayer)
+                Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write($"{game.Players[0].Name}: ");
+            Console.ResetColor();
             Console.Write($"LifePoints: {game.Players[0].LifePoints} Resources: {game.Players[0].Resources}");
             Console.WriteLine();
             Console.WriteLine();
 
 
             Console.Write("Cards in Hand:  | ");
-            foreach (Card card in game.Players[0].CardsInHand)
+            for (int i = 0; i < game.Players[0].CardsInHand.Count; i++)
             {
-                Console.Write("{0}, ",card);
+                Console.Write("{0}.[{1}] ", i + 1, game.Players[0].CardsInHand[i]);
             }
 
             Console.WriteLine();
@@ -82,8 +104,11 @@ namespace LOTR_game
             }
 
             Console.WriteLine();
-            Console.WriteLine(new string('-',25*7)); // ------------------------
 
+            Console.Write(new string('-', 28)); // ------------------------
+            for (int i = 1; i <= 6; i++)
+                Console.Write($"Slot{i}" + new string('-', 23));
+            Console.WriteLine();
 
 
             Console.Write("Cards on Table: | ");
@@ -100,17 +125,39 @@ namespace LOTR_game
 
             Console.Write("Cards in Hand:  | ");
 
-            foreach (Card card in game.Players[1].CardsInHand)
+            for (int i = 0; i < game.Players[1].CardsInHand.Count; i++)
             {
-                Console.Write("{0}, ", card);
+                Console.Write("{0}.[{1}] ", i + 1, game.Players[1].CardsInHand[i]);
+
+
             }
 
             Console.WriteLine();
             Console.WriteLine();
 
-            Console.Write($"{game.Players[1].Name,-10}: ");
+            if (game.Players[1].ActivePlayer)
+                Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write($"{game.Players[1].Name}: ");
+            Console.ResetColor();
             Console.Write($"LifePoints: {game.Players[1].LifePoints} Resources: {game.Players[1].Resources}");
+
+
+            Console.WriteLine();
+            Console.WriteLine();
         }
 
+        internal void UpdateCardMenue(string cardString)
+        {
+            Console.Clear();
+            Console.WriteLine("Card card: " + cardString);
+            Console.WriteLine("1. Update Name");
+            Console.WriteLine("2. Uppdate Cost");
+            Console.WriteLine("3. Uppdate Attack");
+            Console.WriteLine("4. Uppdate Health");
+            Console.WriteLine("5. Remove Ability");
+            Console.WriteLine("6. Add Ability");
+            Console.WriteLine("7. Return to main menue");
+
+        }
     }
 }

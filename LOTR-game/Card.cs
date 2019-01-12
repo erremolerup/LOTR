@@ -12,9 +12,12 @@ namespace LOTR_game
         public string Name { get; set; }
         public int Cost { get; set; }
         public CardType Type { get; set; }
+        public string TypeName { get; set; }
         public List<CardAbility> Abilities { get; set; }
         public int Attack { get; set; }
         public int Health { get; set; }
+
+        public string GetTypeName { get { return Enum.GetName(typeof(CardType), Type); } }
 
         public Card()
         {
@@ -28,16 +31,11 @@ namespace LOTR_game
             stringBuilder.Append(Name + " ");
             stringBuilder.Append("$" + Cost);
 
-            if (Attack != 0 && Health != 0)
+            if (Type == CardType.Creature)
                 stringBuilder.Append($" {Attack}/{Health} ");
 
-            if(Abilities.Count > 0)
-            {
-                foreach (var ability in Abilities)
-                {
-                    stringBuilder.Append($"{Enum.GetName(typeof(AbilityType), ability.Type)}{ability.Value} ");
-                }
-            }
+            if (Abilities.Count > 0)
+                    stringBuilder.Append(string.Join(' ', Abilities));
 
             return stringBuilder.ToString();
         }
@@ -48,7 +46,7 @@ namespace LOTR_game
 
     public enum CardType
     {
-        Creature=1,
+        Creature = 1,
         Spell
     }
 }
